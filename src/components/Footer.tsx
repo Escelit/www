@@ -27,6 +27,11 @@ const columns = [
   },
 ];
 
+const acknowledgments = [
+  { label: 'Stellar', src: '/logos/stellar-mark.svg' },
+  { label: 'Drips', src: '/logos/drips-mark.svg' },
+];
+
 export default function Footer() {
   return (
     <footer className="px-6 pb-8 pt-12 md:px-12">
@@ -63,6 +68,33 @@ export default function Footer() {
                 ))}
               </div>
             ))}
+
+            <div className="flex max-w-[260px] flex-col gap-3">
+              <span className="font-mono text-[10px] font-semibold tracking-[1.5px] text-outline">
+                ACKNOWLEDGMENTS
+              </span>
+              <a
+                href="https://www.drips.network/wave/stellar"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Supported by Stellar Development Foundation's Stellar Wave program via Drips"
+                className="group flex flex-col gap-2 font-body text-[13px] leading-[1.45] text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
+              >
+                <span className="flex items-center gap-2" aria-hidden="true">
+                  {acknowledgments.map((logo) => (
+                    <img
+                      key={logo.label}
+                      src={logo.src}
+                      alt=""
+                      className="h-4 w-4 opacity-70 transition-opacity duration-150 group-hover:opacity-90"
+                    />
+                  ))}
+                </span>
+                <span>
+                  Supported by Stellar Development Foundation&apos;s Stellar Wave program via Drips
+                </span>
+              </a>
+            </div>
           </div>
         </div>
 
