@@ -1,5 +1,5 @@
-import { type KeyboardEvent, useState } from 'react';
-import { copyToClipboard } from '../utils/clipboard';
+import { useState } from 'react';
+import { trackEvent } from '../analytics';
 
 type CodeLine = {
   content: string;
@@ -102,6 +102,11 @@ export default function Hero() {
   const [activeTab, setActiveTab] = useState<Tab>('send.ts');
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
 
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    trackEvent('Code Tab Change', { props: { tab } });
+  };
+
   const lines = codeByTab[activeTab];
 
   const activeTabIndex = tabs.indexOf(activeTab);
@@ -174,6 +179,7 @@ export default function Hero() {
             href="https://docs.usewraith.xyz"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent('Read the Docs')}
             className="flex h-12 items-center justify-center bg-primary px-7 font-heading text-[13px] font-semibold uppercase tracking-[1.5px] text-surface transition-[filter] duration-150 hover:brightness-110"
           >
             Read the Docs
@@ -182,6 +188,7 @@ export default function Hero() {
             href="https://demo.usewraith.xyz"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackEvent('Try the Demo')}
             className="flex h-12 items-center justify-center border border-outline-variant px-7 font-heading text-[13px] font-semibold uppercase tracking-[1.5px] text-primary transition-colors duration-150 hover:bg-surface-bright"
           >
             Try the Demo
@@ -216,14 +223,7 @@ export default function Hero() {
             {tabs.map((tab) => (
               <button
                 key={tab}
-                id={`code-tab-${tab}`}
-                role="tab"
-                type="button"
-                aria-selected={activeTab === tab}
-                aria-controls={`code-panel-${tab}`}
-                tabIndex={activeTab === tab ? 0 : -1}
-                onClick={() => setActiveTab(tab)}
-                onKeyDown={handleTabKeyDown}
+                onClick={() => handleTabChange(tab)}
                 className={`flex items-center justify-center px-3 py-1.5 transition-colors duration-150 ${
                   activeTab === tab
                     ? 'bg-surface-bright'

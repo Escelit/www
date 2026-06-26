@@ -1,3 +1,4 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Features from './components/Features';
@@ -8,13 +9,9 @@ import Compare from './components/Compare';
 import Showcase from './components/Showcase';
 import CtaStrip from './components/CtaStrip';
 import Footer from './components/Footer';
-import Press from './pages/Press';
+import Privacy from './pages/Privacy';
 
-const path = window.location.pathname.replace(/\/$/, '');
-
-export default function App() {
-  if (path === '/press') return <Press />;
-
+function Home() {
   return (
     <div className="bg-surface text-on-surface">
       <a href="#main-content" className="skip-link">
@@ -33,5 +30,16 @@ export default function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/privacy" element={<Privacy />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
