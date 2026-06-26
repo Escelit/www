@@ -1,3 +1,31 @@
+import { useState, useEffect } from 'react';
+
+export default function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    // Check localStorage or prefers-color-scheme
+    const savedTheme = localStorage.getItem('wraith-theme') as 'dark' | 'light' | null;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    setTheme(initialTheme);
+    document.documentElement.setAttribute('data-theme', initialTheme);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+    metaTheme?.setAttribute('content', initialTheme === 'dark' ? '#0e0e0e' : '#faf9f7');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+    metaTheme?.setAttribute('content', newTheme === 'dark' ? '#0e0e0e' : '#faf9f7');
+    localStorage.setItem('wraith-theme', newTheme);
+  };
 import { useEffect, useRef, useState } from 'react';
 
 export default function Header() {
@@ -98,6 +126,15 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          <button
+            onClick={toggleTheme}
+            className="font-body text-[13px] text-outline transition-colors duration-150 hover:text-on-surface-variant"
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            aria-pressed={theme === 'light'}
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <a
             href="https://github.com/wraith-protocol"
             target="_blank"
@@ -137,6 +174,17 @@ export default function Header() {
       </div>
 
       {menuOpen && (
+        <div className="border-t border-outline-variant-30 bg-surface px-6 pb-6 pt-4 md:hidden">
+          <nav className="flex flex-col gap-4">
+            <button
+              onClick={toggleTheme}
+              className="font-body text-[13px] text-outline transition-colors duration-150 hover:text-on-surface-variant text-left"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+              aria-pressed={theme === 'light'}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            >
+              {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+            </button>
         <div
           id="mobile-menu"
           ref={menuRef}
