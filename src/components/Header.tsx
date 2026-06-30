@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { changeLocale, type Locale } from '../i18n';
+import { Link } from 'react-router-dom';
+import { changeLocale, Locale } from '../i18n';
 
 export default function Header() {
   const { t, i18n } = useTranslation();
@@ -193,13 +193,13 @@ export default function Header() {
           aria-label={t(menuOpen ? 'header.menu.close' : 'header.menu.open')}
         >
           <span
-            className={`block h-[1.5px] w-5 bg-on-surface transition-transform duration-150 ${menuOpen ? 'translate-y-[3px] rotate-45' : ''}`}
+            className={`block h-[1.5px] w-5 bg-on-surface transition-transform duration-150 ${menuOpen ? 'translate-y-0.75 rotate-45' : ''}`}
           />
           <span
             className={`block h-[1.5px] w-5 bg-on-surface transition-opacity duration-150 ${menuOpen ? 'opacity-0' : ''}`}
           />
           <span
-            className={`block h-[1.5px] w-5 bg-on-surface transition-transform duration-150 ${menuOpen ? 'translate-y-[-3px] -rotate-45' : ''}`}
+            className={`block h-[1.5px] w-5 bg-on-surface transition-transform duration-150 ${menuOpen ? '-translate-y-0.75 -rotate-45' : ''}`}
           />
         </button>
       </div>

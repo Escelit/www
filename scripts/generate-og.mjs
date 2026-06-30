@@ -14,8 +14,8 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import en from '../src/i18n/en.json' assert { type: 'json' };
-import es from '../src/i18n/es.json' assert { type: 'json' };
+import en from '../src/i18n/en.json' with { type: 'json' };
+import es from '../src/i18n/es.json' with { type: 'json' };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = join(__dirname, '..', 'dist');

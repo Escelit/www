@@ -150,7 +150,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="flex w-full flex-col gap-16 px-6 pt-24 pb-[120px] md:flex-row md:gap-16 md:px-12 md:pt-24 lg:gap-16">
+    <section className="flex w-full flex-col gap-16 px-6 pt-24 pb-30 md:flex-row md:gap-16 md:px-12 md:pt-24 lg:gap-16">
       <div className="flex w-full flex-col gap-8 pt-16 md:w-1/2">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 border border-outline-variant px-2.5 py-1.5">
