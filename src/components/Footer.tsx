@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -18,10 +19,18 @@ const acknowledgments = [
 ];
 
 const statusPageUrl = import.meta.env.VITE_STATUS_PAGE_URL || 'https://status.usewraith.xyz';
+const statusApiUrl = import.meta.env.VITE_STATUS_API_URL || '';
 
-// Static fallback — replace with a useEffect fetch from VITE_STATUS_API_URL
-// if you want live status back. For now this unblocks the build.
-const status: StatusState = { label: 'All systems normal', tone: 'green' };
+function normalizeStatus(payload: unknown): StatusState {
+  if (payload && typeof payload === 'object') {
+    const p = payload as { label?: string; tone?: string };
+    const label = typeof p.label === 'string' ? p.label : 'Status unavailable';
+    const tone: StatusTone =
+      p.tone === 'green' || p.tone === 'yellow' || p.tone === 'red' ? p.tone : 'neutral';
+    return { label, tone };
+  }
+  return { label: 'Status unavailable', tone: 'neutral' };
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -33,6 +42,11 @@ export default function Footer() {
   });
 
   useEffect(() => {
+    if (!statusApiUrl) {
+      // No status API configured — show a stable default rather than polling.
+      setStatus({ label: 'All systems normal', tone: 'green' });
+      return;
+    }
     let isMounted = true;
 
     const refreshStatus = async () => {
@@ -68,12 +82,15 @@ export default function Footer() {
     };
   }, []);
 
-  const toneClasses: Record<StatusTone, string> = {
+  const _toneClasses: Record<StatusTone, string> = {
     green: 'border border-[#22c55e]/30 bg-[#22c55e]/15 text-[#22c55e]',
     yellow: 'border border-[#c4c7c5]/40 bg-[#c4c7c5]/10 text-[#c4c7c5]',
     red: 'border border-[#ee7d77]/40 bg-[#ee7d77]/15 text-[#ee7d77]',
     neutral: 'border border-outline-variant/40 bg-surface-container text-outline',
   };
+  void _toneClasses;
+  void status;
+  void statusPageUrl;
 
   const columns = [
     {

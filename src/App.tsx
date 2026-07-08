@@ -61,6 +61,7 @@ export default function App() {
           <Route path="/faq" element={<Faq />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/use-cases" element={<UseCases />} />
+          <Route path="/roadmap" element={<Roadmap />} />
           {/* Wrap Stellar with Layout */}
           <Route
             path="/stellar"
