@@ -32,6 +32,7 @@ const CaseStudies = lazy(() => import('./pages/CaseStudies'));
 const Careers = lazy(() => import('./pages/Careers'));
 const About = lazy(() => import('./pages/About'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Contributors = lazy(() => import('./pages/Contributors'));
 
 function Home() {
   return (
@@ -108,6 +109,14 @@ export default function App() {
               element={
                 <Layout>
                   <About />
+                </Layout>
+              }
+            />
+            <Route
+              path="/contributors"
+              element={
+                <Layout>
+                  <Contributors />
                 </Layout>
               }
             />
