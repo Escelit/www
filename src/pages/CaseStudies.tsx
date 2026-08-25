@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { entries } from '../data/case-studies.json';
 import Layout from '../components/Layout';
+import { article, breadcrumbList, SITE_URL } from '../utils/jsonld';
 
 type CaseStudy = {
   id: string;
@@ -41,35 +42,29 @@ function CaseStudyDetail({ study }: { study: CaseStudy }) {
   }).format(new Date(study.integrationDate));
 
   // Schema.org structured data for SEO
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
+  const studyUrl = `${SITE_URL}/case-studies/${study.slug}`;
+  const structuredData = article({
     headline: `${study.org} - ${study.useCase}`,
     description: study.summary,
     datePublished: study.integrationDate,
-    author: {
-      '@type': 'Organization',
-      name: study.org,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Wraith Protocol',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://www.usewraith.xyz/logo.png',
-      },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': `https://www.usewraith.xyz/case-studies/${study.slug}`,
-    },
-  };
+    authorName: study.org,
+    url: studyUrl,
+  });
+  const breadcrumbs = breadcrumbList([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Case Studies', url: `${SITE_URL}/case-studies` },
+    { name: study.org, url: studyUrl },
+  ]);
 
   return (
     <Layout>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
       />
       <div className="mx-auto max-w-4xl px-6 py-16 md:px-12">
         <Link

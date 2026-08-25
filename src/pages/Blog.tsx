@@ -13,6 +13,7 @@ import {
   type AuthorLinks,
 } from '../utils/blog';
 import BlogToc from '../components/BlogToc';
+import { article, breadcrumbList, SITE_URL } from '../utils/jsonld';
 
 function AuthorByline({ post }: { post: BlogPost }) {
   if (!post.author) return null;
@@ -37,8 +38,17 @@ function AuthorByline({ post }: { post: BlogPost }) {
 function BlogList() {
   const posts = getAllPosts();
 
+  const listCrumbs = breadcrumbList([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Blog', url: `${SITE_URL}/blog` },
+  ]);
+
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-12 md:px-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listCrumbs) }}
+      />
       <Helmet>
         <title>Blog – Wraith Protocol</title>
         <meta
@@ -122,8 +132,30 @@ function BlogPostDetail({ slug }: { slug: string }) {
 
   const { Component } = post;
 
+  const postUrl = `${SITE_URL}/blog/${post.slug}`;
+  const postArticle = article({
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.date,
+    authorName: post.author,
+    url: postUrl,
+  });
+  const postCrumbs = breadcrumbList([
+    { name: 'Home', url: SITE_URL },
+    { name: 'Blog', url: `${SITE_URL}/blog` },
+    { name: post.title, url: postUrl },
+  ]);
+
   return (
     <article className="mx-auto max-w-5xl px-6 py-12 md:px-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(postArticle) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(postCrumbs) }}
+      />
       <Helmet>
         <title>{post.title} – Wraith Protocol</title>
         {post.excerpt && <meta name="description" content={post.excerpt} />}
@@ -226,6 +258,18 @@ function BlogAuthor({ id }: { id: string }) {
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-12 md:px-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            breadcrumbList([
+              { name: 'Home', url: SITE_URL },
+              { name: 'Blog', url: `${SITE_URL}/blog` },
+              { name: author.name, url: `${SITE_URL}/blog/author/${id}` },
+            ]),
+          ),
+        }}
+      />
       <Helmet>
         <title>{author.name} – Wraith Protocol Blog</title>
         <meta

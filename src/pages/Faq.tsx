@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import faqData from '../data/faq.json';
+import { faqPage } from '../utils/jsonld';
 
 type FaqEntry = {
   id: string;
@@ -69,8 +70,16 @@ export default function Faq() {
 
   const hasResults = filteredEntries.length > 0;
 
+  const faqStructuredData = faqPage(
+    faqEntries.map((entry) => ({ question: entry.question, answer: entry.answer })),
+  );
+
   return (
     <div className="min-h-screen bg-surface text-on-surface">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+      />
       <header className="flex items-center justify-between px-6 py-5 md:px-12">
         <Link to="/" className="flex items-center gap-3">
           <img src="/logo.png" alt="Wraith" width={30} height={24} className="h-6 opacity-90" />

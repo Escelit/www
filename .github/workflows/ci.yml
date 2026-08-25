@@ -21,6 +21,7 @@ jobs:
       - run: pnpm lint:i18n
       - run: pnpm test:a11y
       - run: pnpm build
+      - run: pnpm validate:jsonld
 
   playwright-a11y:
     name: Playwright A11y Gate
