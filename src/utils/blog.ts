@@ -167,3 +167,41 @@ export function getAllTags(): string[] {
   });
   return Array.from(tagSet).sort();
 }
+
+export function slugifyTag(tag: string): string {
+  return String(tag)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function getTagFromSlug(slug: string): string | undefined {
+  return getAllTags().find((tag) => slugifyTag(tag) === slug);
+}
+
+export function getPostsByTag(tag: string): BlogPost[] {
+  return getAllPosts().filter((post) => post.tags.includes(tag));
+}
+
+export function getRelatedPosts(slug: string, limit = 3): BlogPost[] {
+  const all = getAllPosts();
+  const current = all.find((post) => post.slug === slug);
+  if (!current) return [];
+
+  const currentTags = new Set(current.tags);
+
+  return all
+    .filter((post) => post.slug !== slug)
+    .map((post) => ({
+      post,
+      overlap: post.tags.filter((tag) => currentTags.has(tag)).length,
+    }))
+    .filter((entry) => entry.overlap > 0)
+    .sort(
+      (a, b) =>
+        b.overlap - a.overlap || new Date(b.post.date).getTime() - new Date(a.post.date).getTime(),
+    )
+    .slice(0, limit)
+    .map((entry) => entry.post);
+}

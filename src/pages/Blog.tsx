@@ -5,6 +5,10 @@ import {
   getPostBySlug,
   getAuthorById,
   getPostsByAuthor,
+  getPostsByTag,
+  getRelatedPosts,
+  getTagFromSlug,
+  slugifyTag,
   type BlogPost,
   type AuthorLinks,
 } from '../utils/blog';
@@ -123,6 +127,15 @@ function BlogPostDetail({ slug }: { slug: string }) {
       <Helmet>
         <title>{post.title} – Wraith Protocol</title>
         {post.excerpt && <meta name="description" content={post.excerpt} />}
+        {post.tags.map((tag) => (
+          <link
+            key={tag}
+            rel="alternate"
+            type="application/rss+xml"
+            href={`/feed/tag/${slugifyTag(tag)}.xml`}
+            title={`Wraith Protocol Blog — ${tag}`}
+          />
+        ))}
       </Helmet>
 
       <div className="mb-8 flex flex-col gap-3">
@@ -162,6 +175,8 @@ function BlogPostDetail({ slug }: { slug: string }) {
           <Component />
         </div>
       </div>
+
+      <RelatedPosts slug={slug} />
     </article>
   );
 }
@@ -300,8 +315,127 @@ function BlogAuthor({ id }: { id: string }) {
   );
 }
 
+function RelatedPosts({ slug }: { slug: string }) {
+  const related = getRelatedPosts(slug, 3);
+
+  if (related.length === 0) return null;
+
+  return (
+    <section className="mt-12 flex flex-col gap-4 border-t border-outline-variant-30 pt-8">
+      <h2 className="font-heading text-[20px] font-semibold text-on-surface">Related posts</h2>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {related.map((post) => (
+          <Link
+            key={post.slug}
+            to={`/blog/${post.slug}`}
+            className="flex flex-col gap-2 border border-outline-variant-30 p-4 transition-colors hover:border-outline-variant"
+          >
+            <div className="font-mono text-[12px] text-outline">
+              <time dateTime={post.date}>{post.date}</time>
+            </div>
+            <span className="font-heading text-[16px] font-semibold leading-snug text-on-surface hover:text-primary">
+              {post.title}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TagArchive({ tagSlug }: { tagSlug: string }) {
+  const tag = getTagFromSlug(tagSlug);
+
+  if (!tag) {
+    return (
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-6 py-12 md:px-12">
+        <Helmet>
+          <title>Tag Not Found – Wraith Protocol</title>
+        </Helmet>
+        <h1 className="font-heading text-[28px] font-bold text-on-surface">Tag Not Found</h1>
+        <p className="text-on-surface-variant">No posts were found for this tag.</p>
+        <Link to="/blog" className="font-mono text-[13px] text-primary hover:underline">
+          ← Back to Blog
+        </Link>
+      </div>
+    );
+  }
+
+  const posts = getPostsByTag(tag);
+
+  return (
+    <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-12 md:px-12">
+      <Helmet>
+        <title>#{tag} – Wraith Protocol Blog</title>
+        <meta
+          name="description"
+          content={`Blog posts tagged ${tag} from Wraith Protocol on private payments and stealth infrastructure.`}
+        />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          href={`/feed/tag/${slugifyTag(tag)}.xml`}
+          title={`Wraith Protocol Blog — ${tag}`}
+        />
+      </Helmet>
+
+      <div className="flex flex-col gap-3">
+        <p className="font-mono text-[11px] uppercase tracking-[2px] text-outline">Tag</p>
+        <h1 className="font-heading text-[32px] font-semibold leading-tight text-on-surface sm:text-[40px]">
+          #{tag}
+        </h1>
+        <p className="max-w-2xl text-[17px] leading-7 text-on-surface-variant">
+          {posts.length} {posts.length === 1 ? 'post' : 'posts'} tagged “{tag}”.{' '}
+          <Link
+            to={`/feed/tag/${slugifyTag(tag)}.xml`}
+            className="font-mono text-[13px] text-primary hover:underline"
+          >
+            Subscribe via RSS
+          </Link>
+          .
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        {posts.map((post) => (
+          <article
+            key={post.slug}
+            className="flex flex-col gap-2 border border-outline-variant-30 p-6 transition-colors hover:border-outline-variant"
+          >
+            <div className="flex items-center gap-4 font-mono text-[12px] text-outline">
+              <time dateTime={post.date}>{post.date}</time>
+              {post.author && (
+                <>
+                  <span>•</span>
+                  <span>{post.author}</span>
+                </>
+              )}
+            </div>
+            <h2 className="font-heading text-[22px] font-semibold text-on-surface hover:text-primary">
+              <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+            </h2>
+            {post.excerpt && (
+              <p className="font-body text-[15px] leading-relaxed text-on-surface-variant">
+                {post.excerpt}
+              </p>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Blog() {
-  const { slug, authorId } = useParams<{ slug?: string; authorId?: string }>();
+  const { slug, authorId, tagSlug } = useParams<{
+    slug?: string;
+    authorId?: string;
+    tagSlug?: string;
+  }>();
+
+  if (tagSlug) {
+    return <TagArchive tagSlug={tagSlug} />;
+  }
 
   if (authorId) {
     return <BlogAuthor id={authorId} />;

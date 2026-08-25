@@ -1,6 +1,7 @@
 import { writeFileSync, readFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { slugifyTag, parseTags } from './feed-utils.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..');
@@ -69,14 +70,60 @@ function getDistRoutes(dir, base = '') {
   return routes;
 }
 
+/**
+ * Collect every unique blog tag and emit a /blog/tag/:slug archive route
+ */
+function getBlogTagRoutes() {
+  const routes = [];
+  const tags = new Set();
+
+  const blogDir = join(rootDir, 'src', 'content', 'blog');
+  if (existsSync(blogDir)) {
+    for (const file of readdirSync(blogDir).filter((f) => /\.mdx?$/.test(f))) {
+      const raw = readFileSync(join(blogDir, file), 'utf8');
+      const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+      if (match) {
+        const tagsLine = match[1].split('\n').find((line) => line.trim().startsWith('tags:'));
+        if (tagsLine) {
+          const value = tagsLine.slice(tagsLine.indexOf(':') + 1).trim();
+          parseTags(value).forEach((tag) => tags.add(tag));
+        }
+      }
+    }
+  }
+
+  const manifestPath = join(rootDir, 'src', 'data', 'blog-posts.json');
+  if (existsSync(manifestPath)) {
+    try {
+      const data = JSON.parse(readFileSync(manifestPath, 'utf8'));
+      if (Array.isArray(data)) {
+        for (const post of data) {
+          if (Array.isArray(post.tags)) {
+            post.tags.forEach((tag) => tags.add(tag));
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  for (const tag of tags) {
+    routes.push(`/blog/tag/${slugifyTag(tag)}`);
+  }
+
+  return routes;
+}
+
 function generateSitemap() {
   try {
     const csRoutes = getCaseStudyRoutes();
     const distRoutes = existsSync(distDir) ? getDistRoutes(distDir) : [];
+    const tagRoutes = getBlogTagRoutes();
 
-    const allRoutes = Array.from(new Set([...knownRoutes, ...csRoutes, ...distRoutes])).filter(
-      (r) => r && r !== '/404' && !r.includes('/staging') && !r.includes('/preview'),
-    );
+    const allRoutes = Array.from(
+      new Set([...knownRoutes, ...csRoutes, ...distRoutes, ...tagRoutes]),
+    ).filter((r) => r && r !== '/404' && !r.includes('/staging') && !r.includes('/preview'));
 
     const today = new Date().toISOString().split('T')[0];
 
