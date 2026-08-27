@@ -143,6 +143,14 @@ export default function App() {
               }
             />
             <Route
+              path="/blog/tag/:tagSlug"
+              element={
+                <Layout>
+                  <Blog />
+                </Layout>
+              }
+            />
+            <Route
               path="/blog/:slug"
               element={
                 <Layout>

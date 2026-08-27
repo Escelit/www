@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Wraith Protocol Blog</title>
-    <link>https://usewraith.xyz/blog</link>
+    <title>Wraith Protocol Blog — sdk</title>
+    <link>https://usewraith.xyz/blog/tag/sdk</link>
     <description>Notes on stealth payments, private infrastructure, and the Wraith ecosystem.</description>
     <language>en-us</language>
     <lastBuildDate>Tue, 25 Aug 2026 05:06:07 GMT</lastBuildDate>
-    <atom:link href="https://usewraith.xyz/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://usewraith.xyz/feed/tag/sdk.xml" rel="self" type="application/rss+xml" />
 
   <item>
     <title>Wave 7 Kick-off + What We Shipped in Wave 6</title>
@@ -22,14 +22,6 @@
     <guid>https://usewraith.xyz/blog/stealth-addresses-explained</guid>
     <pubDate>Wed, 22 Jul 2026 00:00:00 GMT</pubDate>
     <description>A straightforward introduction to stealth addresses and why they matter for private payments.</description>
-    <author>Wraith Protocol Team</author>
-  </item>
-  <item>
-    <title>Privacy by default</title>
-    <link>https://usewraith.xyz/blog/privacy-by-default</link>
-    <guid>https://usewraith.xyz/blog/privacy-by-default</guid>
-    <pubDate>Mon, 20 Jul 2026 00:00:00 GMT</pubDate>
-    <description>How Wraith makes private payments practical for everyday apps.</description>
     <author>Wraith Protocol Team</author>
   </item>
   </channel>

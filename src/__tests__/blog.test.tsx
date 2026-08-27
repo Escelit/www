@@ -1,7 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import App from '../App';
-import { getAllPosts, getPostBySlug } from '../utils/blog';
+import {
+  getAllPosts,
+  getPostBySlug,
+  getPostsByTag,
+  getRelatedPosts,
+  getTagFromSlug,
+  slugifyTag,
+} from '../utils/blog';
 
 describe('Blog utility & page', () => {
   it('loads blog posts correctly', () => {
@@ -18,6 +25,23 @@ describe('Blog utility & page', () => {
     const post = getPostBySlug('wave-7-kickoff');
     expect(post).toBeDefined();
     expect(post?.title).toContain('Wave 7 Kick-off');
+  });
+
+  it('resolves tags to slugs and back', () => {
+    expect(slugifyTag('Stealth Payments')).toBe('stealth-payments');
+    expect(getTagFromSlug('stealth-payments')).toBeDefined();
+  });
+
+  it('returns related posts by tag overlap and excludes self', () => {
+    const related = getRelatedPosts('wave-7-kickoff', 3);
+    expect(related.every((post) => post.slug !== 'wave-7-kickoff')).toBe(true);
+    expect(related.length).toBeGreaterThan(0);
+  });
+
+  it('lists posts for a tag archive', () => {
+    const tag = getTagFromSlug('stealth-payments')!;
+    const posts = getPostsByTag(tag);
+    expect(posts.length).toBeGreaterThanOrEqual(2);
   });
 
   it('renders blog index page', async () => {
@@ -72,5 +96,15 @@ describe('Blog utility & page', () => {
 
     expect(await screen.findByText(/author not found/i)).toBeInTheDocument();
     expect(screen.getByText(/back to blog/i)).toBeInTheDocument();
+  });
+
+  it('renders a tag archive page', async () => {
+    window.history.replaceState({}, '', '/blog/tag/stealth-payments');
+    render(<App />);
+
+    expect(
+      await screen.findByRole('heading', { name: /#stealth-payments/i, level: 1 }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/subscribe via rss/i)).toBeInTheDocument();
   });
 });

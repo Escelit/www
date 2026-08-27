@@ -281,7 +281,8 @@
       "product": "PRODUCTO",
       "developers": "DESARROLLADORES",
       "resources": "RECURSOS",
-      "acknowledgments": "AGRADECIMIENTOS"
+      "acknowledgments": "AGRADECIMIENTOS",
+      "trust": "TRUST"
     },
     "product": {
       "docs": "Docs",
