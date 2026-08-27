@@ -141,6 +141,14 @@ export default function App() {
                 </Layout>
               }
             />
+            <Route
+              path="/blog/author/:authorId"
+              element={
+                <Layout>
+                  <Blog />
+                </Layout>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

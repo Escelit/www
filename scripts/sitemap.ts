@@ -40,6 +40,26 @@ function getCaseStudyRoutes(): string[] {
   return routes;
 }
 
+function getAuthorRoutes(): string[] {
+  const routes: string[] = [];
+  const authorsPath = join(rootDir, 'src', 'data', 'authors.json');
+  const optOutPath = join(rootDir, 'src', 'data', 'authors-optout.json');
+  if (!existsSync(authorsPath)) return routes;
+  try {
+    const authors = JSON.parse(readFileSync(authorsPath, 'utf8'));
+    const optOut = existsSync(optOutPath) ? JSON.parse(readFileSync(optOutPath, 'utf8')) : [];
+    for (const [id, author] of Object.entries(authors)) {
+      if (optOut.includes(id)) continue;
+      if ((author as { optIn?: boolean }).optIn) {
+        routes.push(`/blog/author/${id}`);
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return routes;
+}
+
 function getRoutes(dir: string, base = ''): string[] {
   const routes: string[] = [];
   if (!existsSync(dir)) {
@@ -61,10 +81,11 @@ function getRoutes(dir: string, base = ''): string[] {
 
 try {
   const csRoutes = getCaseStudyRoutes();
+  const authorRoutes = getAuthorRoutes();
   const distRoutes = existsSync(distDir) ? getRoutes(distDir) : [];
-  const allRoutes = Array.from(new Set([...knownRoutes, ...csRoutes, ...distRoutes])).filter(
-    (r) => r && r !== '/404' && !r.includes('/staging') && !r.includes('/preview'),
-  );
+  const allRoutes = Array.from(
+    new Set([...knownRoutes, ...csRoutes, ...authorRoutes, ...distRoutes]),
+  ).filter((r) => r && r !== '/404' && !r.includes('/staging') && !r.includes('/preview'));
 
   const today = new Date().toISOString().split('T')[0];
 

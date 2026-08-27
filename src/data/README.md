@@ -81,3 +81,39 @@ Drives the Showcase component on the homepage.
 ### Schema
 
 Contains `items` with `title`, `description`, and optional `link` and `tags`.
+
+## `authors.json`
+
+Powers blog author bylines and the `/blog/author/:id` author pages.
+
+MDX posts reference an author by `id` in their frontmatter (`author: 'lena-vogt'`). The id maps to an entry in this file.
+
+### Schema
+
+```typescript
+interface AuthorsData {
+  [id: string]: {
+    /** Display name shown in the byline and on the author page */
+    name: string;
+    /** Short biography shown on the author page */
+    bio: string;
+    /** Optional avatar URL; if omitted, initials are rendered */
+    avatar?: string;
+    /** Optional profile links rendered on the author page */
+    links?: {
+      website?: string;
+      github?: string;
+      twitter?: string;
+      email?: string;
+    };
+    /** When false the author collapses to "Wraith Team" and has no public page */
+    optIn: boolean;
+  };
+}
+```
+
+Opted-out authors (those in `authors-optout.json` or with `optIn: false`) collapse to the "Wraith Team" label in post bylines and never generate a page. Unknown author ids fall back gracefully to the raw string with no link.
+
+## `authors-optout.json`
+
+A flat array of author ids that should never get a public author page and collapse to "Wraith Team" in bylines.

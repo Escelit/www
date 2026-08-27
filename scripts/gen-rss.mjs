@@ -22,6 +22,30 @@ function toRfc822(date) {
   return new Date(date).toUTCString();
 }
 
+let authorsCache = null;
+let optOutCache = null;
+
+function resolveAuthorName(authorId) {
+  if (!authorId) return 'Wraith Team';
+  try {
+    if (!authorsCache) {
+      const aPath = join(rootDir, 'src', 'data', 'authors.json');
+      authorsCache = existsSync(aPath) ? JSON.parse(readFileSync(aPath, 'utf8')) : {};
+    }
+    if (!optOutCache) {
+      const oPath = join(rootDir, 'src', 'data', 'authors-optout.json');
+      optOutCache = existsSync(oPath) ? JSON.parse(readFileSync(oPath, 'utf8')) : [];
+    }
+  } catch {
+    return authorId;
+  }
+  if (optOutCache.includes(authorId)) return 'Wraith Team';
+  const author = authorsCache[authorId];
+  if (author && author.optIn) return author.name;
+  if (author && !author.optIn) return 'Wraith Team';
+  return authorId;
+}
+
 function parseFrontmatter(content) {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return { metadata: {}, content };
@@ -66,7 +90,7 @@ export function getPosts() {
           excerpt: metadata.excerpt ?? '',
           content: content ?? '',
           publishedAt: metadata.publishedAt || metadata.date,
-          author: metadata.author ?? 'Wraith Protocol',
+          author: resolveAuthorName(metadata.author),
           url: metadata.url ?? `${siteUrl}/blog/${slug}`,
         });
       }
@@ -87,7 +111,7 @@ export function getPosts() {
               excerpt: post.excerpt ?? '',
               content: post.content ?? '',
               publishedAt: post.publishedAt || post.date,
-              author: post.author ?? 'Wraith Protocol',
+              author: resolveAuthorName(post.author),
               url: post.url ?? `${siteUrl}/blog/${post.slug}`,
             });
           }
