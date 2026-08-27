@@ -346,6 +346,20 @@
     "viewAll": "VER TODOS",
     "readMore": "Leer Más"
   },
+  "privacyComparison": {
+    "legend": {
+      "publicData": "Datos Públicos",
+      "privateData": "Datos Privados"
+    }
+  },
+  "stealthAnimation": {
+    "benefits": {
+      "unlinkable": "Las direcciones del remitente y receptor nunca se vinculan en cadena",
+      "oneTime": "Cada pago usa una dirección única de un solo uso",
+      "passive": "Solo el destinatario puede detectar y acceder a sus pagos",
+      "noCoordination": "No se requiere coordinación—meta-dirección publicada una vez"
+    }
+  },
   "newsletter": {
     "eyebrow": "MANTENTE AL DÍA",
     "heading": "Boletín",
