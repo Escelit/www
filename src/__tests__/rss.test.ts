@@ -9,7 +9,7 @@ describe('gen-rss script', () => {
     const mdxPost = posts.find((p) => p.slug === 'wave-7-kickoff');
     expect(mdxPost).toBeDefined();
     expect(mdxPost?.title).toContain('Wave 7 Kick-off');
-    expect(mdxPost?.author).toBe('Wraith Protocol Team');
+    expect(mdxPost?.author).toBe('Wraith Team');
     expect(mdxPost?.publishedAt).toBe('2026-07-27');
   });
 

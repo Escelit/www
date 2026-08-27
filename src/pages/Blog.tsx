@@ -1,7 +1,34 @@
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
-import { getAllPosts, getPostBySlug } from '../utils/blog';
+import {
+  getAllPosts,
+  getPostBySlug,
+  getAuthorById,
+  getPostsByAuthor,
+  type BlogPost,
+  type AuthorLinks,
+} from '../utils/blog';
 import BlogToc from '../components/BlogToc';
+
+function AuthorByline({ post }: { post: BlogPost }) {
+  if (!post.author) return null;
+
+  return (
+    <>
+      <span>•</span>
+      {post.authorId ? (
+        <Link
+          to={`/blog/author/${post.authorId}`}
+          className="transition-colors hover:text-on-surface"
+        >
+          {post.authorName}
+        </Link>
+      ) : (
+        <span>{post.authorName}</span>
+      )}
+    </>
+  );
+}
 
 function BlogList() {
   const posts = getAllPosts();
@@ -40,12 +67,7 @@ function BlogList() {
           >
             <div className="flex items-center gap-4 font-mono text-[12px] text-outline">
               <time dateTime={post.date}>{post.date}</time>
-              {post.author && (
-                <>
-                  <span>•</span>
-                  <span>{post.author}</span>
-                </>
-              )}
+              <AuthorByline post={post} />
               <span>•</span>
               <span>{post.readingTimeMin} min read</span>
             </div>
@@ -112,12 +134,7 @@ function BlogPostDetail({ slug }: { slug: string }) {
         </Link>
         <div className="flex items-center gap-4 font-mono text-[12px] text-outline">
           <time dateTime={post.date}>{post.date}</time>
-          {post.author && (
-            <>
-              <span>•</span>
-              <span>{post.author}</span>
-            </>
-          )}
+          <AuthorByline post={post} />
           <span>•</span>
           <span>{post.readingTimeMin} min read</span>
         </div>
@@ -149,8 +166,146 @@ function BlogPostDetail({ slug }: { slug: string }) {
   );
 }
 
+function AuthorInitials({ name }: { name: string }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
+  return (
+    <div className="flex h-16 w-16 items-center justify-center bg-surface-container font-heading text-[18px] font-semibold text-primary">
+      {initials}
+    </div>
+  );
+}
+
+function BlogAuthor({ id }: { id: string }) {
+  const author = getAuthorById(id);
+
+  if (!author) {
+    return (
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 px-6 py-12 md:px-12">
+        <Helmet>
+          <title>Author Not Found – Wraith Protocol</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
+        <h1 className="font-heading text-[28px] font-bold text-on-surface">Author Not Found</h1>
+        <p className="text-on-surface-variant">
+          We couldn&apos;t find a public author page for “{id}”.
+        </p>
+        <Link to="/blog" className="font-mono text-[13px] text-primary hover:underline">
+          ← Back to Blog
+        </Link>
+      </div>
+    );
+  }
+
+  const posts = getPostsByAuthor(id);
+  const links = author.links ?? {};
+  const linkEntries = Object.entries(links).filter(([, value]) => Boolean(value)) as [
+    keyof AuthorLinks,
+    string,
+  ][];
+
+  return (
+    <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-12 md:px-12">
+      <Helmet>
+        <title>{author.name} – Wraith Protocol Blog</title>
+        <meta
+          name="description"
+          content={`Posts by ${author.name} on Wraith Protocol's privacy-preserving payments blog.`}
+        />
+      </Helmet>
+
+      <div className="flex flex-col gap-6 border border-outline-variant-30 p-6">
+        <div className="flex items-start gap-5">
+          {author.avatar ? (
+            <img
+              src={author.avatar}
+              alt={`${author.name}'s avatar`}
+              className="h-16 w-16 bg-surface-container object-cover"
+            />
+          ) : (
+            <AuthorInitials name={author.name} />
+          )}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <h1 className="font-heading text-[26px] font-semibold text-on-surface sm:text-[30px]">
+                {author.name}
+              </h1>
+            </div>
+            <p className="text-[15px] leading-relaxed text-on-surface-variant">{author.bio}</p>
+            {linkEntries.length > 0 && (
+              <div className="mt-1 flex flex-wrap gap-3">
+                {linkEntries.map(([key, value]) => (
+                  <a
+                    key={key}
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[12px] text-primary transition-colors hover:text-on-surface"
+                  >
+                    {key}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <p className="font-mono text-[11px] uppercase tracking-[2px] text-outline">
+          {posts.length} {posts.length === 1 ? 'Post' : 'Posts'}
+        </p>
+        <div className="space-y-6">
+          {posts.map((post) => (
+            <article
+              key={post.slug}
+              className="flex flex-col gap-2 border border-outline-variant-30 p-6 transition-colors hover:border-outline-variant"
+            >
+              <div className="flex items-center gap-4 font-mono text-[12px] text-outline">
+                <time dateTime={post.date}>{post.date}</time>
+              </div>
+              <h2 className="font-heading text-[22px] font-semibold text-on-surface hover:text-primary">
+                <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+              </h2>
+              {post.excerpt && (
+                <p className="font-body text-[15px] leading-relaxed text-on-surface-variant">
+                  {post.excerpt}
+                </p>
+              )}
+              {post.tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="bg-surface-container px-2 py-0.5 font-mono text-[11px] text-outline"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </article>
+          ))}
+          {posts.length === 0 && (
+            <p className="text-on-surface-variant">No posts by this author yet.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Blog() {
-  const { slug } = useParams<{ slug?: string }>();
+  const { slug, authorId } = useParams<{ slug?: string; authorId?: string }>();
+
+  if (authorId) {
+    return <BlogAuthor id={authorId} />;
+  }
 
   if (slug) {
     return <BlogPostDetail slug={slug} />;
