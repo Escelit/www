@@ -273,7 +273,8 @@
       "product": "PRODUTO",
       "developers": "DESENVOLVEDORES",
       "resources": "RECURSOS",
-      "acknowledgments": "AGRADECIMENTOS"
+      "acknowledgments": "AGRADECIMENTOS",
+      "trust": "TRUST"
     },
     "product": {
       "docs": "Docs",
@@ -301,6 +302,12 @@
     "legal": {
       "privacy": "Privacidade",
       "terms": "Termos",
+      "securityTxt": "Security.txt"
+    },
+    "trust": {
+      "security": "Segurança",
+      "privacy": "Privacidade",
+      "vitals": "Web Vitals",
       "securityTxt": "Security.txt"
     }
   },
